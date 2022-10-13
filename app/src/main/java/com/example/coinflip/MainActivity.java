@@ -1,7 +1,9 @@
 package com.example.coinflip;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +22,8 @@ public class MainActivity extends AppCompatActivity
     private TextView vereseg;
     private TextView gyozelem;
     private Random rnd;
-    private int tipp, dobas, nyeres, vesztes, fejIras; //fej 1, iras 2
+    private int dobas, nyeres, vesztes, fejIras; //fej 1, iras 2
+    private AlertDialog.Builder builderVege;
 
 
 
@@ -36,54 +39,90 @@ public class MainActivity extends AppCompatActivity
         fejBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tipp = 1;
                 dobas++;
-                dobasok.setText(String.valueOf(dobas));
                 fejIras = rnd.nextInt(2);
-                switch (fejIras)
+                if (fejIras == 1)
                 {
-                    case 1:
-                        coin.setImageResource(R.drawable.heads);
-                        Toast.makeText(MainActivity.this, "Fej lett", Toast.LENGTH_SHORT).show();
-                        nyeres++;
-                        gyozelem.setText(String.valueOf(nyeres));
-                        break;
-                    case 2:
-                        coin.setImageResource(R.drawable.tails);
-                        vesztes++;
-                        Toast.makeText(MainActivity.this, "Iras lett", Toast.LENGTH_SHORT).show();
-                        vereseg.setText(String.valueOf(vesztes));
-                        break;
+                    coin.setImageResource(R.drawable.heads);
+                    Toast.makeText(MainActivity.this, "Fej lett", Toast.LENGTH_SHORT).show();
+                    nyeres++;
+                    gyozelem.setText("Győzelem: " + String.valueOf(nyeres));
+                    if (dobas == 5)
+                    {
+                        builderVege.setTitle("Vereség").create();
+                        builderVege.show();
+                    }
+                    else if(nyeres == 3)
+                    {
+                        builderVege.setTitle("Győzelem").create();
+                        builderVege.show();
+                    }
                 }
+                else
+                {
+                    coin.setImageResource(R.drawable.tails);
+                    vesztes++;
+                    Toast.makeText(MainActivity.this, "Iras lett", Toast.LENGTH_SHORT).show();
+                    vereseg.setText("Vereség: " + String.valueOf(vesztes));
+                    if (dobas == 5)
+                    {
+                        builderVege.show();
+                        builderVege.setTitle("Vereség").create();
+                    }
+                }
+                dobasok.setText("Dobások: " + String.valueOf(dobas));
             }
         });
 
         irasBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tipp = 2;
                 dobas++;
                 fejIras = rnd.nextInt(2);
-                switch (fejIras)
+                if (fejIras == 1)
                 {
-                    case 1:
-                        coin.setImageResource(R.drawable.heads);
-                        vesztes++;
-                        Toast.makeText(MainActivity.this, "Fej lett", Toast.LENGTH_SHORT).show();
-                        vereseg.setText(String.valueOf(vesztes));
-                        break;
-                    case 2:
-                        coin.setImageResource(R.drawable.tails);
-                        Toast.makeText(MainActivity.this, "Iras lett", Toast.LENGTH_SHORT).show();
-                        nyeres++;
-                        gyozelem.setText(String.valueOf(nyeres));
-                        break;
+                    coin.setImageResource(R.drawable.heads);
+                    Toast.makeText(MainActivity.this, "Fej lett", Toast.LENGTH_SHORT).show();
+                    vesztes++;
+                    vereseg.setText("Vereség: " + String.valueOf(vesztes));
+                    if (dobas == 5)
+                    {
+                        builderVege.show();
+                    }
                 }
+                else
+                {
+                    coin.setImageResource(R.drawable.tails);
+                    nyeres++;
+                    Toast.makeText(MainActivity.this, "Iras lett", Toast.LENGTH_SHORT).show();
+                    gyozelem.setText("Győzelem: " + String.valueOf(nyeres));
+                    if (dobas == 5)
+                    {
+                        builderVege.setTitle("Vereség").create();
+                        builderVege.show();
+                    }
+                    else if(nyeres == 3)
+                    {
+                        builderVege.setTitle("Győzelem").create();
+                        builderVege.show();
+                    }
+                }
+                dobasok.setText("Dobások: " + String.valueOf(dobas));
             }
         });
 
 
 
+    }
+
+    private void ujJatek()
+    {
+        dobas = 0;
+        nyeres = 0;
+        vesztes = 0;
+        gyozelem.setText("Győzelem: " + String.valueOf(nyeres));
+        vereseg.setText("Vereség: " + String.valueOf(vesztes));
+        dobasok.setText("Dobások: " + String.valueOf(dobas));
     }
 
     private void init()
@@ -95,9 +134,24 @@ public class MainActivity extends AppCompatActivity
         vereseg = findViewById(R.id.vereseg);
         gyozelem = findViewById(R.id.gyozelem);
         rnd = new Random();
-        tipp = 0;
         dobas = 0;
         nyeres = 0;
         vesztes = 0;
+        builderVege = new AlertDialog.Builder(MainActivity.this);
+        builderVege.setCancelable(false)
+                .setTitle("Jatek Vege")
+                .setMessage("Uj Jatek?")
+                .setNegativeButton("Nem", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setPositiveButton("Igen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ujJatek();
+                    }
+                }).create();
     }
 }
